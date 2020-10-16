@@ -16,7 +16,7 @@ public class CarroDao {
 		this.conexao = new ConnectionFactory().getConnection();
 	}
 	
-	public boolean inserirCarro(CarroPojo carroPojo) {	
+	public boolean inserirCarroBD(CarroPojo carroPojo) {	
 		String inserirCarroSql = "INSERT INTO carro VALUES (?, ?, ?, ?)";
 		
 		try {
@@ -25,7 +25,7 @@ public class CarroDao {
 			stmt.setString(1, carroPojo.getNome());
 			stmt.setString(2, carroPojo.getPlaca());
 			stmt.setString(3, carroPojo.getMarca());
-			stmt.setInt(5, carroPojo.getAnoFabricacao());
+			stmt.setInt(4, carroPojo.getAnoFabricacao());
 			
 			stmt.execute();
 			stmt.close();	
@@ -37,7 +37,7 @@ public class CarroDao {
 		return true;
 	}
 	
-	public boolean excluirCarro(String placa) {
+	public boolean excluirCarroBD(String placa) {
 		String deletarCarroSql = "DELETE FROM carro WHERE placa = ?";
 		
 		try {
@@ -55,7 +55,7 @@ public class CarroDao {
 		return true;
 	}
 
-	public CarroPojo buscarCarroPorPlaca(String placa) {
+	public CarroPojo buscarCarroPorPlacaBD(String placa) {
 		CarroPojo carroPojo = new CarroPojo();
 		
 		String buscarCarroPorPlacaSql = "SELECT * FROM carro WHERE placa = ?";
@@ -82,7 +82,7 @@ public class CarroDao {
 		return carroPojo;
 	}
 
-	public List<CarroPojo> buscarCarros(){
+	public List<CarroPojo> buscarCarrosBD(){
 		List<CarroPojo> listaCarros = new ArrayList<>();
 		
 		String listarTodosCarrosSql = "SELECT * FROM carro";
