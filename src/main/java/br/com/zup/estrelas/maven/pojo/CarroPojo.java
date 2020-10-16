@@ -2,15 +2,17 @@ package br.com.zup.estrelas.maven.pojo;
 
 public class CarroPojo {
 	private String nome;
+	private String placa;
 	private String marca;
 	private int anoFabricacao;
-	
+
 	public CarroPojo() {
-		
+
 	}
 
-	public CarroPojo(String nome, String marca, int anoFabricacao) {
+	public CarroPojo(String nome, String placa, String marca, int anoFabricacao) {
 		this.nome = nome;
+		this.placa = placa;
 		this.marca = marca;
 		this.anoFabricacao = anoFabricacao;
 	}
@@ -38,4 +40,13 @@ public class CarroPojo {
 	public void setAnoFabricacao(int anoFabricacao) {
 		this.anoFabricacao = anoFabricacao;
 	}
+
+	public String getPlaca() {
+		return placa;
+	}
+
+	public void setPlaca(String placa) {
+		this.placa = placa;
+	}
+
 }
