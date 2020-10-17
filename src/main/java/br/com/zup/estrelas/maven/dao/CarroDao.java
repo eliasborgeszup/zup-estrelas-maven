@@ -6,108 +6,62 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.persistence.Query;
+
 import br.com.zup.estrelas.maven.connection.factory.ConnectionFactory;
-import br.com.zup.estrelas.maven.pojo.CarroPojo;
+import br.com.zup.estrelas.maven.pojo.Carro;
 
 public class CarroDao {
-	private Connection conexao;
+	private EntityManager manager;
 	
 	public CarroDao() {
-		this.conexao = new ConnectionFactory().getConnection();
+		this.manager = Persistence.createEntityManagerFactory("carros").createEntityManager();
 	}
 	
-	public boolean inserirCarroBD(CarroPojo carroPojo) {	
-		String inserirCarroSql = "INSERT INTO carro VALUES (?, ?, ?, ?)";
-		
-		try {
-			PreparedStatement stmt = conexao.prepareStatement(inserirCarroSql);
-			
-			stmt.setString(1, carroPojo.getNome());
-			stmt.setString(2, carroPojo.getPlaca());
-			stmt.setString(3, carroPojo.getMarca());
-			stmt.setInt(4, carroPojo.getAnoFabricacao());
-			
-			stmt.execute();
-			stmt.close();	
-		} catch (SQLException e) {
-			System.out.println(e.getMessage());
-			return false;
-		}
-		
-		return true;
+	public void inserirCarroBD(Carro carro) {		
+		manager.getTransaction().begin();
+		manager.persist(carro);
+		manager.getTransaction().commit();
 	}
 	
 	public boolean excluirCarroBD(String placa) {
-		String deletarCarroSql = "DELETE FROM carro WHERE placa = ?";
-		
-		try {
-			PreparedStatement stmt = conexao.prepareStatement(deletarCarroSql);
-			
-			stmt.setString(1, placa);
-			stmt.execute();
-			stmt.close();
-			
-		} catch (SQLException e) {
-			System.out.println(e.getMessage());
-			return false;
+		Carro carro = manager.find(Carro.class, placa);
+		if(carro != null) {
+			manager.getTransaction().begin();
+			manager.remove(carro);
+			manager.getTransaction().commit();
+			return true;
 		}
 		
-		return true;
+		return false;
 	}
 
-	public CarroPojo buscarCarroPorPlacaBD(String placa) {
-		CarroPojo carroPojo = new CarroPojo();
-		
-		String buscarCarroPorPlacaSql = "SELECT * FROM carro WHERE placa = ?";
-		
-		try {
-			PreparedStatement stmt = conexao.prepareStatement(buscarCarroPorPlacaSql);
-			
-			stmt.setString(1, placa);
-			
-			ResultSet rs = stmt.executeQuery();
-			
-			while (rs.next()) {
-				carroPojo.setNome(rs.getString("nome"));
-				carroPojo.setPlaca(rs.getString("placa"));
-				carroPojo.setMarca(rs.getString("placa"));
-				carroPojo.setAnoFabricacao(rs.getInt("ano_fabricacao"));
-			}
-			
-			stmt.close();
-		} catch (SQLException e) {
-			System.out.println(e.getMessage());
-		}
-		
-		return carroPojo;
+	public List<Carro> buscarCarrosBD(){				
+		return manager.createQuery("select c from Carro as c").getResultList();
 	}
-
-	public List<CarroPojo> buscarCarrosBD(){
-		List<CarroPojo> listaCarros = new ArrayList<>();
+	
+	public List<Carro> buscarCarroPorPlacaBD(String placa) {
+		Query query = manager.createQuery("select c from Carro as c where c.placa = :placa");
 		
-		String listarTodosCarrosSql = "SELECT * FROM carro";
+		query.setParameter("placa", placa);
 		
-		try {
-			PreparedStatement stmt = conexao.prepareStatement(listarTodosCarrosSql);
-			
-			ResultSet rs = stmt.executeQuery();
-			
-			while(rs.next()) {
-				CarroPojo carroPojo = new CarroPojo();
-				
-				carroPojo.setNome(rs.getString("nome"));
-				carroPojo.setPlaca(rs.getString("placa"));
-				carroPojo.setMarca(rs.getString("placa"));
-				carroPojo.setAnoFabricacao(rs.getInt("ano_fabricacao"));
-				
-				listaCarros.add(carroPojo);
-			}
-			
-			stmt.close();
-		} catch (SQLException e) {
-			System.out.println(e.getMessage());
-		}
+		List<Carro> listaCarros = query.getResultList();
 		
 		return listaCarros;
 	}
+
+	public List<Carro> buscarCarroPorFabricanteBD(String fabricante) {
+		Query query = manager.createQuery("select c from Carro as c where c.fabricante = :fabricante");
+		
+		query.setParameter("fabricante", fabricante);
+		
+		List<Carro> listaCarros = query.getResultList();
+		
+		return listaCarros;
+	}
+	
 }
